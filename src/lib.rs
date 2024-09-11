@@ -1,2 +1,2 @@
-pub mod todo;
 pub mod command;
+pub mod todo;
