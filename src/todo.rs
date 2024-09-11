@@ -13,6 +13,7 @@ use crate::command::Command;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Todo {
+    pub id: u16,
     pub title: String,
     pub body: String,
     pub updated_at: String,
@@ -20,7 +21,7 @@ pub struct Todo {
 }
 
 impl Todo {
-    fn new(title: &String, body: &String) -> Self {
+    fn new(id: &u16, title: &String, body: &String) -> Self {
         let created_at: DateTime<Local> = Local::now();
         let updated_at: DateTime<Local> = Local::now();
 
@@ -28,6 +29,7 @@ impl Todo {
         let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
 
         Self {
+            id: *id,
             title: title.to_string(),
             body: body.to_string(),
             updated_at,
@@ -59,17 +61,30 @@ impl Todo {
         }
 
         //create new Todo.
-        let todo = Todo::new(&title, &body);
 
         let file_name = "todos.json";
         let mut todos = Todo::read_from_file(&file_name).unwrap();
+        let mut id = todos.len() as u16;
+
+        if id <= 0 {
+            id = 1;
+        }
+        let todo = Todo::new(&mut id, &title, &body);
 
         todos.push(todo);
 
         Todo::write_to_file(&file_name, &todos);
     }
     pub fn read() {
-        println!("Read method called")
+        let file_name = "todos.json";
+
+        let mut todos = Todo::read_from_file(&file_name).unwrap();
+
+        println!("Listing all todos: ");
+
+        for todo in todos {
+            println!("{:?}", todo);
+        }
     }
     pub fn update() {
         println!("Update method called")
