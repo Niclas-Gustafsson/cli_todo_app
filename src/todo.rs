@@ -1,4 +1,3 @@
-use chrono::format::{DelayedFormat, StrftimeItems};
 use chrono::{DateTime, Local};
 use colored::*;
 // use serde_json::Error;
@@ -7,7 +6,6 @@ use std::fs::{File, OpenOptions};
 use std::io::*;
 // use std::io::{BufWriter, Write};
 use std::path::Path;
-use std::process;
 
 use crate::command::Command;
 
@@ -66,7 +64,7 @@ impl Todo {
         let mut todos = Todo::read_from_file(&file_name).unwrap();
         let mut id = todos.len() as u16;
 
-        if id <= 0 {
+        if id == 0 {
             id = 1;
         }
         let todo = Todo::new(&mut id, &title, &body);
@@ -75,10 +73,11 @@ impl Todo {
 
         Todo::write_to_file(&file_name, &todos);
     }
+
     pub fn read() {
         let file_name = "todos.json";
 
-        let mut todos = Todo::read_from_file(&file_name).unwrap();
+        let todos = Todo::read_from_file(&file_name).unwrap();
 
         println!("Listing all todos: ");
 
@@ -86,9 +85,30 @@ impl Todo {
             println!("{:?}", todo);
         }
     }
-    pub fn update() {
-        println!("Update method called")
+
+    pub fn update(file_name: &str) {
+        // read from file and parse to vec
+        let todos = Todo::read_from_file(file_name).unwrap();
+        // read and parse input from user. Should be a number (id)
+        println!("parsed todos: {:?}", todos);
+        //ask user which todo to modify by id
+        let mut id = String::new();
+
+        //let mut title = String::new();
+        //let mut body = String::new();
+
+        println!("{}", "Enter the id of todo to update".bright_blue());
+        stdin().read_line(&mut id).expect("failed to read line.");
+        id = id.trim().to_string();
+        let id = id.parse::<u16>().ok();
+
+        let found_todo: Option<&Todo> = id.and_then(|id| todos.iter().find(|&item| item.id == id));
+        println!("Todo to update: {:?}", found_todo);
+        // ask user which field? (title or body) to update. Or have them enter it all in one go?
+        // let them enter the updated value
+        // update todo and vec, write to file.
     }
+
     pub fn delete() {
         println!("Delete method called")
     }

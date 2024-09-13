@@ -1,7 +1,7 @@
 use cli_todo::command::Command;
 use colored::Colorize;
 use std::env;
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::path::Path;
 
 // use cli_todo::todo::*;
@@ -9,8 +9,7 @@ use std::path::Path;
 fn main() -> std::io::Result<()> {
     //Look for storage file, if not there create new storage file
     // let mut file = File::open("todos.json")?;
-    let file_name = "todos.json";
-
+    let file_name: &str = "todos.json";
     if Path::new(file_name).exists() {
         let current_path = env::current_dir()?;
         println!(
@@ -32,7 +31,7 @@ fn main() -> std::io::Result<()> {
     // write information about the file, if it's empty (has no todos)
 
     //If storage file exists, print contents to the terminal and start command prompt/ listen for prompt
-    Command::command_loop();
+    Command::command_loop(&file_name);
 
     Ok(())
 }
