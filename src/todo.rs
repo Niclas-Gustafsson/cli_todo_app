@@ -88,13 +88,13 @@ impl Todo {
 
     pub fn update(file_name: &str) {
         // read from file and parse to vec
-        let todos = Todo::read_from_file(file_name).unwrap();
+        let mut todos = Todo::read_from_file(file_name).unwrap();
         // read and parse input from user. Should be a number (id)
         println!("parsed todos: {:?}", todos);
         //ask user which todo to modify by id
         let mut id = String::new();
 
-        //let mut title = String::new();
+        let mut operation = String::new();
         //let mut body = String::new();
 
         println!("{}", "Enter the id of todo to update".bright_blue());
@@ -102,11 +102,21 @@ impl Todo {
         id = id.trim().to_string();
         let id = id.parse::<u16>().ok();
 
-        let found_todo: Option<&Todo> = id.and_then(|id| todos.iter().find(|&item| item.id == id));
-        println!("Todo to update: {:?}", found_todo);
+        let todo_to_update: Option<usize> =
+            id.and_then(|id| todos.iter().position(|item| item.id == id));
+        //let todo_update_index = todos.iter().position(|&x| x.id == id).unwrap();
+        println!("Todo to update index: {:?}", todo_to_update.unwrap());
         // ask user which field? (title or body) to update. Or have them enter it all in one go?
-        // let them enter the updated value
+        println!(
+            "Enter field and value to be updated, separated by comma. E.g 'title, some value'."
+        );
+        stdin()
+            .read_line(&mut operation)
+            .expect("Failed to read line.");
+        let split_ops: Vec<&str> = operation.trim().split(",").collect();
+        println!("{:?}", split_ops);
         // update todo and vec, write to file.
+        //let got = std::mem::replace(&mut v[3], 42);
     }
 
     pub fn delete() {
