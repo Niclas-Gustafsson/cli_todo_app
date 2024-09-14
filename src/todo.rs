@@ -35,7 +35,7 @@ impl Todo {
         }
     }
 
-    pub fn create() {
+    pub fn create(file_path: &str) {
         // println!("Create method called");
         let mut title = String::new();
         let mut body = String::new();
@@ -60,18 +60,20 @@ impl Todo {
 
         //create new Todo.
 
-        let file_name = "todos.json";
-        let mut todos = Todo::read_from_file(&file_name).unwrap();
+        let mut todos = Todo::read_from_file(file_path).unwrap();
         let mut id = todos.len() as u16;
+        println!("Id before comparison: {}", id);
 
         if id == 0 {
             id = 1;
+        } else {
+            id += 1;
         }
         let todo = Todo::new(&mut id, &title, &body);
 
         todos.push(todo);
 
-        Todo::write_to_file(&file_name, &todos);
+        Todo::write_to_file(file_path, &todos);
     }
 
     pub fn read() {
@@ -102,10 +104,13 @@ impl Todo {
         id = id.trim().to_string();
         let id = id.parse::<u16>().ok();
 
-        let todo_to_update: Option<usize> =
+        let todo_update_index: Option<usize> =
             id.and_then(|id| todos.iter().position(|item| item.id == id));
         //let todo_update_index = todos.iter().position(|&x| x.id == id).unwrap();
-        println!("Todo to update index: {:?}", todo_to_update.unwrap());
+        let mut todo_to_update = &todos[todo_update_index.unwrap()];
+        println!("Todo to update: {:?}", todo_to_update);
+
+        println!("Todo to update index: {:?}", todo_update_index.unwrap());
         // ask user which field? (title or body) to update. Or have them enter it all in one go?
         println!(
             "Enter field and value to be updated, separated by comma. E.g 'title, some value'."

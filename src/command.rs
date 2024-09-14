@@ -45,7 +45,7 @@ impl Command {
             println!("You entered: {}", &user_input);
 
             match Command::parse_command(user_input.trim()) {
-                Some(Command::Create) => Todo::create(),
+                Some(Command::Create) => Todo::create(file_path),
                 Some(Command::Read) => Todo::read(),
                 Some(Command::Update) => Todo::update(file_path),
                 Some(Command::Delete) => Todo::delete(),
