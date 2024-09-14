@@ -94,13 +94,9 @@ impl Todo {
 
         let updated_at: DateTime<Local> = Local::now();
         let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
-        // read and parse input from user. Should be a number (id)
-        println!("parsed todos: {:?}", todos);
-        //ask user which todo to modify by id
-        let mut id = String::new();
 
+        let mut id = String::new();
         let mut operation = String::new();
-        //let mut body = String::new();
 
         println!("{}", "Enter the id of todo to update".bright_blue());
         stdin().read_line(&mut id).expect("failed to read line.");
@@ -109,12 +105,11 @@ impl Todo {
 
         let todo_update_index: Option<usize> =
             id.and_then(|id| todos.iter().position(|item| item.id == id));
-        //let todo_update_index = todos.iter().position(|&x| x.id == id).unwrap();
-        let todo_to_update = &mut todos[todo_update_index.unwrap()];
-        println!("Todo to update: {:?}", todo_to_update);
 
-        println!("Todo to update index: {:?}", todo_update_index.unwrap());
-        // ask user which field? (title or body) to update. Or have them enter it all in one go?
+        let todo_to_update = &mut todos[todo_update_index.unwrap()];
+
+        // ask user for title && body to update
+        //Does not consider errors, like more than two commas or even commas within title and body, ajjabaja.
         println!(
             "{}",
             "Enter the new values in the format: <Title>, <Body> separated by ','".bright_blue()
@@ -128,16 +123,30 @@ impl Todo {
         todo_to_update.body = split_ops[1].to_string();
         todo_to_update.updated_at = updated_at;
 
+        //Clone to get rid of reference issues in replace.
         let todo_clone = todo_to_update.clone();
 
         let _ = std::mem::replace(&mut todos[todo_update_index.unwrap()], todo_clone);
-        // println!("Todos after update: {:?}", updated_todos_vec);
-        println!("Todos after update: {:?}", todos);
+
         Todo::write_to_file(file_path, &todos);
     }
 
-    pub fn delete() {
-        println!("Delete method called")
+    pub fn delete(file_path: &str) {
+        let mut todos = Todo::read_from_file(file_path).unwrap();
+
+        let mut id = String::new();
+
+        println!("{}", "Enter the id of todo to delete".bright_blue());
+        stdin().read_line(&mut id).expect("failed to read line.");
+        id = id.trim().to_string();
+        let id = id.parse::<u16>().ok();
+
+        let todo_delete_index: Option<usize> =
+            id.and_then(|id| todos.iter().position(|item| item.id == id));
+
+        // let todo_to_delete = &mut todos[todo_delete_index.unwrap()];
+        todos.remove(todo_delete_index.unwrap());
+        Todo::write_to_file(file_path, &todos);
     }
 
     //Helper funcs

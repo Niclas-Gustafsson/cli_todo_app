@@ -48,7 +48,7 @@ impl Command {
                 Some(Command::Create) => Todo::create(file_path),
                 Some(Command::Read) => Todo::read(),
                 Some(Command::Update) => Todo::update(file_path),
-                Some(Command::Delete) => Todo::delete(),
+                Some(Command::Delete) => Todo::delete(file_path),
                 Some(Command::Quit) => Command::quit_program(),
                 None => println!(
                     "{}",
