@@ -9,7 +9,7 @@ use std::path::Path;
 
 use crate::command::Command;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Todo {
     pub id: u16,
     pub title: String,
@@ -88,9 +88,12 @@ impl Todo {
         }
     }
 
-    pub fn update(file_name: &str) {
+    pub fn update(file_path: &str) {
         // read from file and parse to vec
-        let mut todos = Todo::read_from_file(file_name).unwrap();
+        let mut todos = Todo::read_from_file(file_path).unwrap();
+
+        let updated_at: DateTime<Local> = Local::now();
+        let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
         // read and parse input from user. Should be a number (id)
         println!("parsed todos: {:?}", todos);
         //ask user which todo to modify by id
@@ -107,21 +110,30 @@ impl Todo {
         let todo_update_index: Option<usize> =
             id.and_then(|id| todos.iter().position(|item| item.id == id));
         //let todo_update_index = todos.iter().position(|&x| x.id == id).unwrap();
-        let mut todo_to_update = &todos[todo_update_index.unwrap()];
+        let todo_to_update = &mut todos[todo_update_index.unwrap()];
         println!("Todo to update: {:?}", todo_to_update);
 
         println!("Todo to update index: {:?}", todo_update_index.unwrap());
         // ask user which field? (title or body) to update. Or have them enter it all in one go?
         println!(
-            "Enter field and value to be updated, separated by comma. E.g 'title, some value'."
+            "{}",
+            "Enter the new values in the format: <Title>, <Body> separated by ','".bright_blue()
         );
         stdin()
             .read_line(&mut operation)
             .expect("Failed to read line.");
         let split_ops: Vec<&str> = operation.trim().split(",").collect();
-        println!("{:?}", split_ops);
-        // update todo and vec, write to file.
-        //let got = std::mem::replace(&mut v[3], 42);
+
+        todo_to_update.title = split_ops[0].to_string();
+        todo_to_update.body = split_ops[1].to_string();
+        todo_to_update.updated_at = updated_at;
+
+        let todo_clone = todo_to_update.clone();
+
+        let _ = std::mem::replace(&mut todos[todo_update_index.unwrap()], todo_clone);
+        // println!("Todos after update: {:?}", updated_todos_vec);
+        println!("Todos after update: {:?}", todos);
+        Todo::write_to_file(file_path, &todos);
     }
 
     pub fn delete() {
