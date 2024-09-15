@@ -19,7 +19,7 @@ pub struct Todo {
 }
 
 impl Todo {
-    fn new(id: &u16, title: &String, body: &String) -> Self {
+    fn new(id: u16, title: &String, body: &String) -> Self {
         let created_at: DateTime<Local> = Local::now();
         let updated_at: DateTime<Local> = Local::now();
 
@@ -27,7 +27,7 @@ impl Todo {
         let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
 
         Self {
-            id: *id,
+            id,
             title: title.to_string(),
             body: body.to_string(),
             updated_at,
@@ -47,7 +47,7 @@ impl Todo {
             Command::quit_program();
         }
 
-        stdout().flush().unwrap();
+        //stdout().flush().unwrap();
 
         println!("{}", "What do you need to do?".bright_blue());
         stdin().read_line(&mut body).expect("Unable to read line.");
@@ -69,7 +69,7 @@ impl Todo {
         } else {
             id += 1;
         }
-        let todo = Todo::new(&mut id, &title, &body);
+        let todo = Todo::new(id, &title, &body);
 
         todos.push(todo);
 
@@ -79,7 +79,7 @@ impl Todo {
     pub fn read() {
         let file_name = "todos.json";
 
-        let todos = Todo::read_from_file(&file_name).unwrap();
+        let todos = Todo::read_from_file(file_name).unwrap();
 
         println!("Listing all todos: ");
 
